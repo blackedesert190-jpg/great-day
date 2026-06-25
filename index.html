@@ -3,38 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Glowing Lotus Garden</title>
+    <title>The Glowing Lotus Garden</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --bg-dark: #07040a;
+            --rose-gold: #e5a4b4;
+            --deep-plum: #321625;
+            --bright-lotus: #f26d97;
+            --gold-glow: #e0b034;
+            --champagne: #fff5ea;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background: #060308;
+            background: var(--bg-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             overflow: hidden;
+            perspective: 1000px;
         }
         
         #container {
             position: relative;
-            width: 92vw;
-            height: 82vh;
-            max-width: 400px;
-            max-height: 700px;
+            width: 94vw;
+            height: 86vh;
+            max-width: 420px;
+            max-height: 740px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            background: radial-gradient(circle at center 75%, #140b1a 0%, #030105 100%);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            background: radial-gradient(circle at center 80%, #1a0f24 0%, #060308 100%);
+            border-radius: 32px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.85), 
+                        inset 0 1px 0px rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        /* Ambient Breathing Lights in Background */
+        #container::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 30% 80%, rgba(242, 109, 151, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 40%, rgba(224, 176, 52, 0.05) 0%, transparent 40%);
+            animation: ambientDrift 20s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes ambientDrift {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(10deg) scale(1.1); }
         }
 
         canvas {
             background: transparent;
-            border-radius: 24px;
+            border-radius: 32px;
             position: absolute;
             top: 0;
             left: 0;
@@ -49,101 +83,114 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 24px;
+            border-radius: 32px;
             pointer-events: none;
             z-index: 2;
             opacity: 0;
-            transition: opacity 2s ease-out;
+            transition: opacity 2.5s cubic-bezier(0.25, 1, 0.5, 1);
             background-image: 
-                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
-                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
-            background-size: 250px 250px, 150px 150px, 100px 100px;
-            animation: shimmerBackground 10s linear infinite;
+                radial-gradient(var(--champagne), rgba(255,255,255,.15) 1.5px, transparent 2.5px),
+                radial-gradient(var(--rose-gold), rgba(229,164,180,.1) 1px, transparent 2px);
+            background-size: 200px 200px, 130px 130px;
+            animation: shimmerBackground 15s linear infinite;
         }
 
         @keyframes shimmerBackground {
-            0% { background-position: 0 0, 20px 30px, 50px 70px; }
-            100% { background-position: 250px 250px, 170px 180px, 150px 370px; }
+            0% { background-position: 0 0, 10px 20px; }
+            100% { background-position: 200px 200px, 140px 280px; }
         }
 
         #wowOverlay.active {
             opacity: 1;
-            box-shadow: inset 0 0 80px 40px rgba(255, 229, 240, 0.25);
+            box-shadow: inset 0 0 100px 30px rgba(229, 164, 180, 0.15);
         }
 
+        /* Glassmorphic Premium Button */
         #playBtn {
             position: relative;
             z-index: 10;
-            padding: 16px 40px;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            background: linear-gradient(135deg, #d62462 0%, #591a32 100%);
-            border: 2px solid #ff4081;
-            border-radius: 40px;
+            padding: 18px 44px;
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            color: var(--champagne);
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.5);
-            transition: all 0.3s ease-out;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4),
+                        0 0 25px rgba(242, 109, 151, 0.1);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             touch-action: manipulation;
         }
 
-        #playBtn:active {
-            transform: scale(0.95);
+        #playBtn:hover {
+            border-color: var(--rose-gold);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4),
+                        0 0 30px rgba(242, 109, 151, 0.25);
+            letter-spacing: 6px;
         }
 
+        #playBtn:active {
+            transform: scale(0.97);
+        }
+
+        /* High-End Typography Styling */
         #greetingText {
             position: absolute;
-            top: 32%; 
+            top: 26%; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
-            font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
-            font-size: 26px;
-            font-weight: 300;
-            font-style: italic;
-            letter-spacing: 2px;
-            color: #ffe5f0;
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            color: var(--champagne);
             text-align: center;
             pointer-events: none;
-            width: 85%;
-            text-shadow: 0 0 15px rgba(255, 102, 178, 0.8), 0 2px 4px rgba(0,0,0,0.9);
+            width: 90%;
+            text-shadow: 0 0 20px rgba(242, 109, 151, 0.6), 
+                         0 4px 10px rgba(0,0,0,0.8);
+            line-height: 1.6;
         }
 
         .magic-char {
             display: inline-block;
             opacity: 0;
-            transform: translateY(-5px) scale(0.9);
-            filter: blur(4px);
-            animation: magicSpell 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            transform: translateY(8px) scale(0.95);
+            filter: blur(6px);
+            animation: premiumSpell 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        @keyframes magicSpell {
+        @keyframes premiumSpell {
             0% {
                 opacity: 0;
-                transform: translateY(-10px) scale(0.8);
-                filter: blur(6px);
-                color: #ffb300;
+                transform: translateY(12px) scale(0.9);
+                filter: blur(8px);
+                color: var(--gold-glow);
             }
-            50% {
-                opacity: 1;
+            60% {
+                opacity: 0.8;
                 filter: blur(2px);
-                color: #ff4081;
+                color: var(--bright-lotus);
             }
             100% {
                 opacity: 1;
                 transform: translateY(0) scale(1);
                 filter: blur(0px);
-                color: #ffe5f0;
+                color: var(--champagne);
             }
         }
 
         .hide {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: scale(0.8) !important;
+            transform: translateY(20px) scale(0.9) !important;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
     </style>
 </head>
@@ -152,7 +199,7 @@
     <div id="container">
         <canvas id="lotusCanvas"></canvas>
         <div id="wowOverlay"></div>
-        <button id="playBtn">CLICK ME</button>
+        <button id="playBtn">ENTER GARDEN</button>
         <div id="greetingText"></div>
     </div>
 
@@ -170,9 +217,10 @@ let animationId;
 let textTriggered = false;
 let wowEffectTriggered = false;
 
-const PINK_GLOW = '#ff66b2';
-const GOLD_GLOW = '#ffb300';
-const WHITE_CORE = '#ffe5f0';
+// Aesthetic Config Color Constants
+const PINK_GLOW = 'rgba(242, 109, 151, 0.7)';
+const GOLD_GLOW = 'rgba(224, 176, 52, 0.8)';
+const WHITE_CORE = '#fff5ea';
 
 function resizeCanvas() {
     const rect = container.getBoundingClientRect();
@@ -182,13 +230,13 @@ function resizeCanvas() {
 
 class Particle {
     constructor(x, y, color = WHITE_CORE, glow = PINK_GLOW, speedMult = 1, sizeMult = 1) {
-        this.x = x + (Math.random() * 30 - 15);
+        this.x = x + (Math.random() * 24 - 12);
         this.y = y;
-        this.size = (Math.random() * 2.5 + 0.5) * sizeMult;
-        this.speedY = -(Math.random() * 1.0 + 0.4) * speedMult;
-        this.speedX = (Math.random() * 0.8 - 0.4) * speedMult;
+        this.size = (Math.random() * 2.0 + 0.6) * sizeMult;
+        this.speedY = -(Math.random() * 0.8 + 0.3) * speedMult;
+        this.speedX = (Math.random() * 0.6 - 0.3) * speedMult;
         this.alpha = 1;
-        this.fade = (Math.random() * 0.009 + 0.004);
+        this.fade = (Math.random() * 0.007 + 0.003);
         this.color = color;
         this.glow = glow;
     }
@@ -200,7 +248,7 @@ class Particle {
     draw() {
         ctx.save();
         ctx.globalAlpha = this.alpha;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.shadowColor = this.glow;
         ctx.fillStyle = this.color;
         ctx.beginPath();
@@ -213,20 +261,20 @@ class Particle {
 class Lotus {
     constructor(x) {
         this.x = x;
-        this.startY = canvas.height + 20; 
+        this.startY = canvas.height + 30; 
         this.currentProgress = 0; 
-        this.growSpeed = 0.005 + Math.random() * 0.002;
+        this.growSpeed = 0.004 + Math.random() * 0.0015; // Slightly slower for relaxed feel
         
-        // Dynamic Curved Arch Calculation:
-        // Calculates distance from the horizontal center line to scale heights beautifully.
+        // Dynamic Golden-Ratio Curved Arch Profile
         const distanceFromCenter = Math.abs(x - canvas.width / 2) / (canvas.width / 2);
-        const baseHeightCurve = canvas.height * (0.35 + (distanceFromCenter * 0.18)); 
-        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.05);
+        const baseHeightCurve = canvas.height * (0.40 + (distanceFromCenter * 0.16)); 
+        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.04);
         
         this.bloomProgress = 0; 
-        this.maxFlowerSize = canvas.width * 0.12; 
+        this.maxFlowerSize = canvas.width * (0.11 + (1 - distanceFromCenter) * 0.03); // Center flowers are dynamically larger
 
-        this.controlX = this.x + (Math.random() * 60 - 30);
+        // Organic stem curvature
+        this.controlX = this.x + (Math.random() * 80 - 40);
         this.controlY = (canvas.height + this.targetY) / 2;
 
         this.leafData = [];
@@ -234,10 +282,10 @@ class Lotus {
         let sideTracker = Math.random() > 0.5 ? 1 : -1;
         for(let i = 0; i < leafCount; i++) {
             this.leafData.push({
-                progressTrigger: 0.3 + (i * 0.3),
-                scaleX: 1.1 * sideTracker,
-                scaleY: 0.9,
-                rotation: (-Math.PI / 6)
+                progressTrigger: 0.25 + (i * 0.35),
+                scaleX: 1.2 * sideTracker,
+                scaleY: 0.8,
+                rotation: (-Math.PI / 5)
             });
             sideTracker *= -1;
         }
@@ -261,14 +309,14 @@ class Lotus {
             if (this.currentProgress > 1) this.currentProgress = 1;
             
             const headPos = this.getBezierPoint(this.currentProgress);
-            if (Math.random() < 0.25) {
+            if (Math.random() < 0.2) {
                 particles.push(new Particle(headPos.x, headPos.y));
             }
         } else if (this.bloomProgress < 1) {
-            this.bloomProgress += 0.015;
+            this.bloomProgress += 0.012;
             if (this.bloomProgress > 1) this.bloomProgress = 1;
             const headPos = this.getBezierPoint(1);
-            if (Math.random() < 0.35) {
+            if (Math.random() < 0.3) {
                 particles.push(new Particle(headPos.x, headPos.y - 5));
             }
         }
@@ -280,16 +328,16 @@ class Lotus {
         ctx.rotate(rotation * (scaleX > 0 ? 1 : -1));
         ctx.scale(scaleX, scaleY);
         
-        let leafGrad = ctx.createLinearGradient(0, 0, 25, -35);
-        leafGrad.addColorStop(0, 'rgba(34, 61, 41, 0.85)');
-        leafGrad.addColorStop(0.6, 'rgba(54, 92, 64, 0.6)');
-        leafGrad.addColorStop(1, 'rgba(90, 135, 100, 0.2)');
+        let leafGrad = ctx.createLinearGradient(0, 0, 20, -30);
+        leafGrad.addColorStop(0, 'rgba(28, 48, 35, 0.9)');
+        leafGrad.addColorStop(0.6, 'rgba(46, 74, 55, 0.6)');
+        leafGrad.addColorStop(1, 'rgba(74, 107, 83, 0.15)');
         ctx.fillStyle = leafGrad;
         
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.quadraticCurveTo(15, -15, 12, -45);
-        ctx.quadraticCurveTo(-5, -20, 0, 0);
+        ctx.quadraticCurveTo(12, -12, 10, -35);
+        ctx.quadraticCurveTo(-4, -16, 0, 0);
         ctx.fill();
         ctx.restore();
     }
@@ -312,10 +360,12 @@ class Lotus {
         
         ctx.beginPath();
         ctx.moveTo(this.x, this.startY);
+        
+        ctx.strokeStyle = '#18291e'; 
+        ctx.lineWidth = 3.0; 
+        ctx.lineCap = 'round';
+        
         if (this.currentProgress < 1) {
-            ctx.strokeStyle = '#2d4232'; 
-            ctx.lineWidth = 3.5; 
-            ctx.lineCap = 'round';
             for(let t=0; t<=this.currentProgress; t+=0.02) {
                 let pt = this.getBezierPoint(t);
                 ctx.lineTo(pt.x, pt.y);
@@ -323,9 +373,6 @@ class Lotus {
             ctx.stroke();
         } else {
             ctx.quadraticCurveTo(this.controlX, this.controlY, this.x, this.targetY);
-            ctx.strokeStyle = '#2d4232'; 
-            ctx.lineWidth = 3.5; 
-            ctx.lineCap = 'round';
             ctx.stroke();
         }
 
@@ -345,18 +392,18 @@ class Lotus {
             ctx.translate(headPos.x, headPos.y);
             ctx.rotate(tipAngle);
 
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = 'rgba(255, 50, 130, 0.4)';
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = 'rgba(242, 109, 151, 0.35)';
 
             let outerGrad = ctx.createLinearGradient(0, 0, 0, -size);
-            outerGrad.addColorStop(0, '#591a32'); 
-            outerGrad.addColorStop(0.7, '#d62462'); 
-            outerGrad.addColorStop(1, '#ff8fa9'); 
+            outerGrad.addColorStop(0, '#2d1222'); 
+            outerGrad.addColorStop(0.6, '#bf4b75'); 
+            outerGrad.addColorStop(1, '#e5a4b4'); 
 
             let innerGrad = ctx.createLinearGradient(0, 0, 0, -size * 0.9);
-            innerGrad.addColorStop(0, '#a62454');
-            innerGrad.addColorStop(0.8, '#f74a87');
-            innerGrad.addColorStop(1, '#ffb8ce');
+            innerGrad.addColorStop(0, '#591b37');
+            innerGrad.addColorStop(0.7, '#f26d97');
+            innerGrad.addColorStop(1, '#fff5ea');
 
             ctx.fillStyle = outerGrad;
             this.drawPetal(size * 0.7, size * 0.9, -Math.PI / 4 * this.bloomProgress);
@@ -371,14 +418,14 @@ class Lotus {
 
             if (this.bloomProgress > 0.5) {
                 ctx.save();
-                ctx.shadowColor = GOLD_GLOW;
-                let coreGrad = ctx.createRadialGradient(0, -size*0.1, 0, 0, -size*0.1, size * 0.3);
+                ctx.shadowColor = 'rgba(224, 176, 52, 0.6)';
+                let coreGrad = ctx.createRadialGradient(0, -size*0.1, 0, 0, -size*0.1, size * 0.35);
                 coreGrad.addColorStop(0, WHITE_CORE);
-                coreGrad.addColorStop(0.4, GOLD_GLOW);
+                coreGrad.addColorStop(0.3, '#e0b034');
                 coreGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = coreGrad;
                 ctx.beginPath();
-                ctx.arc(0, -size * 0.1, size * 0.22 * (this.bloomProgress - 0.5) * 2, 0, Math.PI * 2);
+                ctx.arc(0, -size * 0.1, size * 0.25 * (this.bloomProgress - 0.5) * 2, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
@@ -421,15 +468,15 @@ function animate() {
 
     if (allBloomed && !textTriggered && flowers.length > 0) {
         textTriggered = true;
-        triggerMagicText("Have a Great Day!");
+        triggerMagicText("Have a Beautiful Day");
     }
 
     if (textTriggered && !wowEffectTriggered) {
-        const lastCharDelay = 17 * 0.10; 
-        const textDuration = lastCharDelay + 0.6; 
+        const lastCharDelay = 21 * 0.08; 
+        const textDuration = lastCharDelay + 1.0; 
         
         wowEffectTriggered = true;
-        setTimeout(triggerWowEffect, (textDuration * 1000) + 100); 
+        setTimeout(triggerWowEffect, (textDuration * 1000)); 
     }
 
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -450,7 +497,7 @@ function triggerMagicText(text) {
         let span = document.createElement("span");
         span.innerHTML = char === " " ? "&nbsp;" : char; 
         span.classList.add("magic-char");
-        span.style.animationDelay = `${index * 0.10}s`; 
+        span.style.animationDelay = `${index * 0.08}s`; 
         greetingText.appendChild(span);
     });
 }
@@ -458,15 +505,15 @@ function triggerMagicText(text) {
 function triggerWowEffect() {
     wowOverlay.classList.add('active');
 
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 50; i++) {
         const pX = Math.random() * canvas.width;
-        const pY = Math.random() * canvas.height;
+        const pY = Math.random() * (canvas.height * 0.7);
         
-        const useGold = Math.random() > 0.5;
-        const pColor = useGold ? WHITE_CORE : '#fffced';
+        const useGold = Math.random() > 0.4;
+        const pColor = useGold ? WHITE_CORE : '#fff9f2';
         const pGlow = useGold ? GOLD_GLOW : PINK_GLOW;
         
-        particles.push(new Particle(pX, pY, pColor, pGlow, 2.5, 0.7)); 
+        particles.push(new Particle(pX, pY, pColor, pGlow, 1.8, 0.8)); 
     }
 }
 
