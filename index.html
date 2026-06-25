@@ -27,12 +27,15 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-        }
-
-        canvas {
+            /* Moved background gradient here to cover the entire container panel flawlessly */
             background: radial-gradient(circle at center 75%, #140b1a 0%, #030105 100%);
             border-radius: 24px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        canvas {
+            background: transparent; /* Changed to transparent so container background shows through */
+            border-radius: 24px;
             position: absolute;
             top: 0;
             left: 0;
@@ -94,10 +97,10 @@
             transform: scale(0.95);
         }
 
-        /* Elegant text placed perfectly right above the blooming heads */
+        /* Elegant text adjustment */
         #greetingText {
             position: absolute;
-            top: 18%; /* Perfectly cradles the space above the flower growth zone */
+            top: 32%; /* Lowered from 18% to perfectly sit right above the blooming heads */
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
@@ -159,6 +162,7 @@
     </div>
 
 <script>
+const container = document.getElementById('container');
 const canvas = document.getElementById('lotusCanvas');
 const ctx = canvas.getContext('2d');
 const playBtn = document.getElementById('playBtn');
@@ -175,7 +179,7 @@ const PINK_GLOW = '#ff66b2';
 const GOLD_GLOW = '#ffb300';
 const WHITE_CORE = '#ffe5f0';
 
-// Resize the drawing buffer to match the exact iPhone card resolution dynamically
+// Resize the drawing buffer to match the exact resolution dynamically
 function resizeCanvas() {
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width;
@@ -219,7 +223,7 @@ class Lotus {
         this.currentProgress = 0; 
         this.growSpeed = 0.005 + Math.random() * 0.002;
         
-        // Target height calibrated for typical iPhone display heights
+        // Target height calibrated for typical display heights
         this.targetY = canvas.height * 0.42 + Math.random() * (canvas.height * 0.15); 
         this.bloomProgress = 0; 
         this.maxFlowerSize = canvas.width * 0.12; // Scaled relative to the width of the screen
@@ -471,7 +475,6 @@ function triggerWowEffect() {
 // Initial calculation
 window.addEventListener('load', () => {
     resizeCanvas();
-    // Pre-draw an empty canvas with the card background alignment
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
