@@ -262,18 +262,21 @@ class Lotus {
         this.startY = canvas.height + 20 + (Math.random() * 40); 
         this.currentProgress = 0; 
         
-        // Dynamic growth speed window
         this.growSpeed = 0.003 + Math.random() * 0.004; 
         
-        // Deep field distribution: target heights randomized strictly in the lower half
-        const baseHeightCurve = canvas.height * 0.52; 
-        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.22);
+        // Dynamic target window allows flowers to dynamically shoot up very high (up to 32% top area) 
+        // down to very low (78%), mimicking your layout accurately while leaving breathing room under the greeting text.
+        this.targetY = canvas.height * (0.32 + Math.random() * 0.46);
         
         this.bloomProgress = 0; 
-        this.maxFlowerSize = canvas.width * (0.07 + Math.random() * 0.05); 
+        
+        // Scale the flower size according to its height for natural visual depth 
+        const heightFactor = (this.targetY / canvas.height); 
+        this.maxFlowerSize = canvas.width * (0.06 + (heightFactor * 0.05)); 
 
-        this.controlX = this.x + (Math.random() * 140 - 70);
-        this.controlY = this.startY - (this.startY - this.targetY) * (0.3 + Math.random() * 0.4);
+        // Elegant flowing natural arches for the stems
+        this.controlX = this.x + (Math.random() * 100 - 50);
+        this.controlY = this.startY - (this.startY - this.targetY) * (0.4 + Math.random() * 0.3);
 
         this.leafData = [];
         const leafCount = Math.floor(Math.random() * 2) + 1; 
@@ -359,7 +362,7 @@ class Lotus {
         ctx.moveTo(this.x, this.startY);
         
         ctx.strokeStyle = '#142118'; 
-        ctx.lineWidth = 2.2; 
+        ctx.lineWidth = 2.0; 
         ctx.lineCap = 'round';
         
         if (this.currentProgress < 1) {
@@ -444,13 +447,13 @@ function initGarden() {
     const totalStems = 18; 
 
     for (let i = 0; i < totalStems; i++) {
+        // Balanced layout distribution logic across the entire canvas profile area width
         let xPos = (canvas.width * 0.05) + (Math.random() * (canvas.width * 0.90));
         let newLotus = new Lotus(xPos);
         flowers.push(newLotus);
     }
     
-    // Sort logic remains: higher targetY (visually lower down on screen) 
-    // prints over background flowers for deep landscape perspective
+    // Sort flowers so shorter-stem background elements render behind taller elements nicely
     flowers.sort((a, b) => b.targetY - a.targetY);
 }
 
@@ -461,14 +464,13 @@ function animate() {
     flowers.forEach(flower => {
         flower.update();
         flower.draw();
-        if (flower.bloomProgress >= 0.8) {
+        if (flower.bloomProgress >= 0.7) {
             bloomedCount++;
         }
     });
 
-    // OPTIMIZATION FIXED HERE: 
-    // Trigger text once at least 5 flowers have fully opened up, instead of waiting for all 18.
-    if (bloomedCount >= 5 && !textTriggered && flowers.length > 0) {
+    // Triggers text gracefully once a beautiful subset of flowers are up
+    if (bloomedCount >= 6 && !textTriggered && flowers.length > 0) {
         textTriggered = true;
         triggerMagicText("Have a Beautiful Day");
     }
