@@ -259,35 +259,29 @@ class Particle {
 class Lotus {
     constructor(x) {
         this.x = x;
-        // Randomize base starting position along the bottom slightly to look like a true field
-        this.startY = canvas.height + 20 + (Math.random() * 30); 
+        this.startY = canvas.height + 20 + (Math.random() * 40); 
         this.currentProgress = 0; 
         
-        // Slower, varying speeds so they pop up organically at different times
-        this.growSpeed = 0.003 + Math.random() * 0.0025; 
+        // Dynamic growth speed window
+        this.growSpeed = 0.003 + Math.random() * 0.004; 
         
-        // Calculated arch, but with a high degree of random height variance for a natural field
-        const distanceFromCenter = Math.abs(x - canvas.width / 2) / (canvas.width / 2);
-        const baseHeightCurve = canvas.height * (0.54 + (distanceFromCenter * 0.12)); 
-        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.15);
+        // Deep field distribution: target heights randomized strictly in the lower half
+        const baseHeightCurve = canvas.height * 0.52; 
+        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.22);
         
         this.bloomProgress = 0; 
-        
-        // Varying flower sizes so some look closer/further away
-        this.maxFlowerSize = canvas.width * (0.07 + Math.random() * 0.04); 
+        this.maxFlowerSize = canvas.width * (0.07 + Math.random() * 0.05); 
 
-        // Wild, randomized stems curves
-        this.controlX = this.x + (Math.random() * 120 - 60);
+        this.controlX = this.x + (Math.random() * 140 - 70);
         this.controlY = this.startY - (this.startY - this.targetY) * (0.3 + Math.random() * 0.4);
 
-        // Individual unique leaf counts
         this.leafData = [];
         const leafCount = Math.floor(Math.random() * 2) + 1; 
         let sideTracker = Math.random() > 0.5 ? 1 : -1;
         for(let i = 0; i < leafCount; i++) {
             this.leafData.push({
-                progressTrigger: 0.2 + (i * 0.3) + Math.random() * 0.15,
-                scaleX: (1.0 + Math.random() * 0.4) * sideTracker,
+                progressTrigger: 0.2 + (i * 0.3) + Math.random() * 0.1,
+                scaleX: (1.0 + Math.random() * 0.3) * sideTracker,
                 scaleY: 0.7 + Math.random() * 0.2,
                 rotation: (-Math.PI / (4 + Math.random() * 2))
             });
@@ -313,14 +307,14 @@ class Lotus {
             if (this.currentProgress > 1) this.currentProgress = 1;
             
             const headPos = this.getBezierPoint(this.currentProgress);
-            if (Math.random() < 0.15) {
+            if (Math.random() < 0.12) {
                 particles.push(new Particle(headPos.x, headPos.y));
             }
         } else if (this.bloomProgress < 1) {
             this.bloomProgress += 0.015;
             if (this.bloomProgress > 1) this.bloomProgress = 1;
             const headPos = this.getBezierPoint(1);
-            if (Math.random() < 0.2) {
+            if (Math.random() < 0.15) {
                 particles.push(new Particle(headPos.x, headPos.y - 4));
             }
         }
@@ -365,11 +359,11 @@ class Lotus {
         ctx.moveTo(this.x, this.startY);
         
         ctx.strokeStyle = '#142118'; 
-        ctx.lineWidth = 2.4; 
+        ctx.lineWidth = 2.2; 
         ctx.lineCap = 'round';
         
         if (this.currentProgress < 1) {
-            for(let t=0; t<=this.currentProgress; t+=0.03) {
+            for(let t=0; t<=this.currentProgress; t+=0.04) {
                 let pt = this.getBezierPoint(t);
                 ctx.lineTo(pt.x, pt.y);
             }
@@ -447,34 +441,34 @@ function initGarden() {
     greetingText.innerHTML = "";
     wowOverlay.classList.remove('active');
     
-    // Increased to 18 flowers for a dense field/meadow texture look
     const totalStems = 18; 
 
     for (let i = 0; i < totalStems; i++) {
-        // Distribute loosely across the horizontal canvas space randomly
-        let xPos = (canvas.width * 0.08) + (Math.random() * (canvas.width * 0.84));
+        let xPos = (canvas.width * 0.05) + (Math.random() * (canvas.width * 0.90));
         let newLotus = new Lotus(xPos);
         flowers.push(newLotus);
     }
     
-    // Sort flowers based on targetY height so that shorter flowers are drawn 
-    // in front of taller ones, rendering a realistic field depth!
+    // Sort logic remains: higher targetY (visually lower down on screen) 
+    // prints over background flowers for deep landscape perspective
     flowers.sort((a, b) => b.targetY - a.targetY);
 }
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let allBloomed = true;
+    let bloomedCount = 0;
     flowers.forEach(flower => {
         flower.update();
         flower.draw();
-        if (flower.bloomProgress < 1) {
-            allBloomed = false;
+        if (flower.bloomProgress >= 0.8) {
+            bloomedCount++;
         }
     });
 
-    if (allBloomed && !textTriggered && flowers.length > 0) {
+    // OPTIMIZATION FIXED HERE: 
+    // Trigger text once at least 5 flowers have fully opened up, instead of waiting for all 18.
+    if (bloomedCount >= 5 && !textTriggered && flowers.length > 0) {
         textTriggered = true;
         triggerMagicText("Have a Beautiful Day");
     }
