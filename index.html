@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowing Lotus Garden</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #060308;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+        
+        #container {
+            position: relative;
+            width: 800px;
+            height: 650px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            background: radial-gradient(circle at center, #140b1a 0%, #030105 100%);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* The WOW effect overlay on the canvas */
+        #wowOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 2s ease-out;
+            /* Shimmering background texture */
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            animation: shimmerBackground 10s linear infinite;
+        }
+
+        @keyframes shimmerBackground {
+            0% { background-position: 0 0, 40px 60px, 130px 270px; }
+            100% { background-position: 550px 550px, 390px 410px, 380px 820px; }
+        }
+
+        #wowOverlay.active {
+            opacity: 1;
+            /* Initial bright flash */
+            box-shadow: inset 0 0 100px 50px rgba(255, 229, 240, 0.3);
+        }
+
+        /* Large Centered Click Me Button */
+        #playBtn {
+            position: relative;
+            z-index: 10;
+            padding: 18px 50px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #d62462 0%, #591a32 100%);
+            border: 2px solid #ff4081;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 64, 129, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #playBtn:hover {
+            background: linear-gradient(135deg, #ff4081 0%, #7c1a40 100%);
+            box-shadow: 0 12px 35px rgba(255, 64, 129, 0.7);
+            transform: scale(1.1);
+        }
+
+        #playBtn:active {
+            transform: scale(0.95);
+        }
+
+        /* Elegant Text at the Top - Scaled up slightly */
+        #greetingText {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
+            font-size: 46px; 
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: 4px;
+            color: #ffe5f0;
+            text-align: center;
+            pointer-events: none;
+            min-width: 700px;
+            text-shadow: 0 0 20px rgba(255, 102, 178, 0.8), 0 2px 5px rgba(0,0,0,0.9);
+        }
+
+        /* Individual Character Glow Entry for Magic Spell Effect */
+        .magic-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(-5px) scale(0.9);
+            filter: blur(4px);
+            animation: magicSpell 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        @keyframes magicSpell {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.8);
+                filter: blur(6px);
+                color: #ffb300;
+            }
+            50% {
+                opacity: 1;
+                filter: blur(2px);
+                color: #ff4081;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+                color: #ffe5f0;
+            }
+        }
+
+        .hide {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: scale(0.8) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <canvas id="lotusCanvas" width="800" height="650"></canvas>
+        <div id="wowOverlay"></div>
+        <button id="playBtn">CLICK ME</button>
+        <div id="greetingText"></div>
+    </div>
+
+<script>
+const canvas = document.getElementById('lotusCanvas');
+const ctx = canvas.getContext('2d');
+const playBtn = document.getElementById('playBtn');
+const greetingText = document.getElementById('greetingText');
+const wowOverlay = document.getElementById('wowOverlay');
+
+let flowers = [];
+let particles = [];
+let animationId;
+let textTriggered = false;
+let wowEffectTriggered = false;
+
+const PINK_GLOW = '#ff66b2';
+const GOLD_GLOW = '#ffb300';
+const WHITE_CORE = '#ffe5f0';
+
+class Particle {
+    constructor(x, y, color = WHITE_CORE, glow = PINK_GLOW, speedMult = 1, sizeMult = 1) {
+        this.x = x + (Math.random() * 50 - 25);
+        this.y = y;
+        this.size = (Math.random() * 3.0 + 0.5) * sizeMult;
+        this.speedY = -(Math.random() * 0.8 + 0.3) * speedMult;
+        this.speedX = (Math.random() * 0.8 - 0.4) * speedMult;
+        this.alpha = 1;
+        this.fade = (Math.random() * 0.007 + 0.003);
+        this.color = color;
+        this.glow = glow;
+    }
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.alpha -= this.fade;
+    }
+    draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = this.glow;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+class Lotus {
+    constructor(x) {
+        this.x = x;
+        this.startY = canvas.height + 50;
+        this.currentProgress = 0; 
+        this.growSpeed = 0.004 + Math.random() * 0.002;
+        
+        this.targetY = 220 + Math.random() * 140; 
+        this.bloomProgress = 0; 
+        this.maxFlowerSize = 80; 
+
+        this.controlX = this.x + (Math.random() * 120 - 60);
+        this.controlY = (canvas.height + this.targetY) / 2;
+
+        this.leafData = [];
+        const leafCount = 3; 
+        let sideTracker = Math.random() > 0.5 ? 1 : -1;
+        for(let i = 0; i < leafCount; i++) {
+            this.leafData.push({
+                progressTrigger: 0.2 + (i * 0.25),
+                scaleX: 1.4 * sideTracker,
+                scaleY: 1.0,
+                rotation: (-Math.PI / 6)
+            });
+            sideTracker *= -1;
+        }
+    }
+
+    getBezierPoint(t) {
+        const x = (1 - t) * (1 - t) * this.x + 2 * (1 - t) * t * this.controlX + t * t * this.x;
+        const y = (1 - t) * (1 - t) * this.startY + 2 * (1 - t) * t * this.controlY + t * t * this.targetY;
+        return { x, y };
+    }
+
+    getBezierAngle(t) {
+        const dx = 2 * (1 - t) * (this.controlX - this.x) + 2 * t * (this.x - this.controlX);
+        const dy = 2 * (1 - t) * (this.controlY - this.startY) + 2 * t * (this.targetY - this.controlY);
+        return Math.atan2(dy, dx) + Math.PI / 2;
+    }
+
+    update() {
+        if (this.currentProgress < 1) {
+            this.currentProgress += this.growSpeed;
+            if (this.currentProgress > 1) this.currentProgress = 1;
+            
+            const headPos = this.getBezierPoint(this.currentProgress);
+            if (Math.random() < 0.2) {
+                particles.push(new Particle(headPos.x, headPos.y));
+            }
+        } else if (this.bloomProgress < 1) {
+            this.bloomProgress += 0.012;
+            if (this.bloomProgress > 1) this.bloomProgress = 1;
+            const headPos = this.getBezierPoint(1);
+            if (Math.random() < 0.3) {
+                particles.push(new Particle(headPos.x, headPos.y - 10));
+            }
+        }
+    }
+
+    drawLeaf(x, y, scaleX, scaleY, rotation) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rotation * (scaleX > 0 ? 1 : -1));
+        ctx.scale(scaleX, scaleY);
+        
+        let leafGrad = ctx.createLinearGradient(0, 0, 40, -50);
+        leafGrad.addColorStop(0, 'rgba(34, 61, 41, 0.8)');
+        leafGrad.addColorStop(0.6, 'rgba(54, 92, 64, 0.55)');
+        leafGrad.addColorStop(1, 'rgba(90, 135, 100, 0.15)');
+        ctx.fillStyle = leafGrad;
+        
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(25, -25, 20, -75);
+        ctx.quadraticCurveTo(-10, -35, 0, 0);
+        ctx.fill();
+        
+        ctx.strokeStyle = 'rgba(110, 160, 120, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.quadraticCurveTo(12, -30, 20, -75);
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+
+    drawPetal(w, h, angle) {
+        ctx.save();
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-w * 0.8, -h * 0.4, -w * 0.2, -h);
+        ctx.lineTo(0, -h * 1.05); 
+        ctx.lineTo(w * 0.2, -h);
+        ctx.quadraticCurveTo(w * 0.8, -h * 0.4, 0, 0);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    draw() {
+        ctx.save();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.startY);
+        if (this.currentProgress < 1) {
+            ctx.strokeStyle = '#2d4232'; 
+            ctx.lineWidth = 4.5; 
+            ctx.lineCap = 'round';
+            for(let t=0; t<=this.currentProgress; t+=0.01) {
+                let pt = this.getBezierPoint(t);
+                ctx.lineTo(pt.x, pt.y);
+            }
+            ctx.stroke();
+        } else {
+            ctx.quadraticCurveTo(this.controlX, this.controlY, this.x, this.targetY);
+            ctx.strokeStyle = '#2d4232'; 
+            ctx.lineWidth = 4.5; 
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        this.leafData.forEach(leaf => {
+            if (this.currentProgress > leaf.progressTrigger) {
+                const leafPos = this.getBezierPoint(leaf.progressTrigger);
+                const tangentAngle = this.getBezierAngle(leaf.progressTrigger);
+                this.drawLeaf(leafPos.x, leafPos.y, leaf.scaleX, leaf.scaleY, leaf.rotation + tangentAngle);
+            }
+        });
+
+        if (this.currentProgress >= 1 && this.bloomProgress > 0) {
+            const size = this.maxFlowerSize * this.bloomProgress;
+            const headPos = this.getBezierPoint(1);
+            const tipAngle = this.getBezierAngle(1);
+            
+            ctx.translate(headPos.x, headPos.y);
+            ctx.rotate(tipAngle);
+
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = 'rgba(255, 50, 130, 0.5)';
+
+            let outerGrad = ctx.createLinearGradient(0, 0, 0, -size);
+            outerGrad.addColorStop(0, '#591a32'); 
+            outerGrad.addColorStop(0.7, '#d62462'); 
+            outerGrad.addColorStop(1, '#ff8fa9'); 
+
+            let innerGrad = ctx.createLinearGradient(0, 0, 0, -size * 0.9);
+            innerGrad.addColorStop(0, '#a62454');
+            innerGrad.addColorStop(0.8, '#f74a87');
+            innerGrad.addColorStop(1, '#ffb8ce');
+
+            ctx.fillStyle = outerGrad;
+            this.drawPetal(size * 0.7, size * 0.9, -Math.PI / 4 * this.bloomProgress);
+            this.drawPetal(size * 0.7, size * 0.9, Math.PI / 4 * this.bloomProgress);
+            this.drawPetal(size * 0.6, size * 1.0, -Math.PI / 7 * this.bloomProgress);
+            this.drawPetal(size * 0.6, size * 1.0, Math.PI / 7 * this.bloomProgress);
+
+            ctx.fillStyle = innerGrad;
+            this.drawPetal(size * 0.5, size * 1.1, -Math.PI / 16 * this.bloomProgress);
+            this.drawPetal(size * 0.5, size * 1.1, Math.PI / 16 * this.bloomProgress);
+            this.drawPetal(size * 0.4, size * 1.15, 0); 
+
+            if (this.bloomProgress > 0.5) {
+                ctx.save();
+                ctx.shadowColor = GOLD_GLOW;
+                let coreGrad = ctx.createRadialGradient(0, -size*0.1, 0, 0, -size*0.1, size * 0.3);
+                coreGrad.addColorStop(0, WHITE_CORE);
+                coreGrad.addColorStop(0.4, GOLD_GLOW);
+                coreGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = coreGrad;
+                ctx.beginPath();
+                ctx.arc(0, -size * 0.1, size * 0.25 * (this.bloomProgress - 0.5) * 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        ctx.restore();
+    }
+}
+
+function initGarden() {
+    flowers = [];
+    particles = [];
+    textTriggered = false;
+    wowEffectTriggered = false;
+    greetingText.innerHTML = "";
+    wowOverlay.classList.remove('active');
+    
+    const totalStems = 5; 
+    const spacing = canvas.width / (totalStems + 1); 
+
+    // Balanced size uniformity. The sizes are clustered tightly so the last two 
+    // look equally full and visually identical to the rest of the garden.
+    const definedSizes = [84, 82, 80, 78, 76]; 
+    
+    for (let i = 1; i <= totalStems; i++) {
+        let xPos = (i * spacing);
+        let newLotus = new Lotus(xPos);
+
+        newLotus.maxFlowerSize = definedSizes[i - 1];
+
+        flowers.push(newLotus);
+    }
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let allBloomed = true;
+    flowers.forEach(flower => {
+        flower.update();
+        flower.draw();
+        if (flower.bloomProgress < 1) {
+            allBloomed = false;
+        }
+    });
+
+    if (allBloomed && !textTriggered && flowers.length > 0) {
+        textTriggered = true;
+        triggerMagicText("Have a Great Day!");
+    }
+
+    if (textTriggered && !wowEffectTriggered) {
+        const lastCharDelay = 17 * 0.12; 
+        const textDuration = lastCharDelay + 0.6; 
+        
+        wowEffectTriggered = true;
+        setTimeout(triggerWowEffect, (textDuration * 1000) + 200); 
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+
+    animationId = requestAnimationFrame(animate);
+}
+
+function triggerMagicText(text) {
+    greetingText.innerHTML = ""; 
+    
+    text.split("").forEach((char, index) => {
+        let span = document.createElement("span");
+        span.innerHTML = char === " " ? "&nbsp;" : char; 
+        span.classList.add("magic-char");
+        span.style.animationDelay = `${index * 0.12}s`; 
+        greetingText.appendChild(span);
+    });
+}
+
+function triggerWowEffect() {
+    wowOverlay.classList.add('active');
+
+    for (let i = 0; i < 60; i++) {
+        const pX = Math.random() * canvas.width;
+        const pY = Math.random() * canvas.height;
+        
+        const useGold = Math.random() > 0.5;
+        const pColor = useGold ? WHITE_CORE : '#fffced';
+        const pGlow = useGold ? GOLD_GLOW : PINK_GLOW;
+        
+        particles.push(new Particle(pX, pY, pColor, pGlow, 3, 0.7)); 
+    }
+}
+
+playBtn.addEventListener('click', () => {
+    playBtn.classList.add('hide');
+    cancelAnimationFrame(animationId);
+    initGarden();
+    animate();
+});
+</script>
+</body>
+</html>
