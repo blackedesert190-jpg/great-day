@@ -6,7 +6,7 @@
     <title>The Glowing Lotus Garden</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -110,9 +110,8 @@
             position: relative;
             z-index: 10;
             padding: 18px 44px;
-            font-family: 'Cinzel', serif;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 4px;
             color: var(--champagne);
             background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
@@ -138,24 +137,25 @@
             transform: scale(0.97);
         }
 
-        /* High-End Typography Styling */
+        /* High-End, Elegant Serif Typography Layout */
         #greetingText {
             position: absolute;
-            top: 26%; 
+            top: 20%; /* Raised from 26% to clear more space above the flowers */
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
-            font-family: 'Cinzel', serif;
-            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 28px;
             font-weight: 400;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             color: var(--champagne);
             text-align: center;
             pointer-events: none;
             width: 90%;
-            text-shadow: 0 0 20px rgba(242, 109, 151, 0.6), 
-                         0 4px 10px rgba(0,0,0,0.8);
-            line-height: 1.6;
+            text-shadow: 0 0 20px rgba(242, 109, 151, 0.5), 
+                         0 4px 12px rgba(0,0,0,0.8);
+            line-height: 1.5;
         }
 
         .magic-char {
@@ -199,7 +199,7 @@
     <div id="container">
         <canvas id="lotusCanvas"></canvas>
         <div id="wowOverlay"></div>
-        <button id="playBtn">ENTER GARDEN</button>
+        <button id="playBtn">CLICK ME</button>
         <div id="greetingText"></div>
     </div>
 
@@ -217,7 +217,6 @@ let animationId;
 let textTriggered = false;
 let wowEffectTriggered = false;
 
-// Aesthetic Config Color Constants
 const PINK_GLOW = 'rgba(242, 109, 151, 0.7)';
 const GOLD_GLOW = 'rgba(224, 176, 52, 0.8)';
 const WHITE_CORE = '#fff5ea';
@@ -263,17 +262,15 @@ class Lotus {
         this.x = x;
         this.startY = canvas.height + 30; 
         this.currentProgress = 0; 
-        this.growSpeed = 0.004 + Math.random() * 0.0015; // Slightly slower for relaxed feel
+        this.growSpeed = 0.004 + Math.random() * 0.0015; 
         
-        // Dynamic Golden-Ratio Curved Arch Profile
         const distanceFromCenter = Math.abs(x - canvas.width / 2) / (canvas.width / 2);
         const baseHeightCurve = canvas.height * (0.40 + (distanceFromCenter * 0.16)); 
         this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.04);
         
         this.bloomProgress = 0; 
-        this.maxFlowerSize = canvas.width * (0.11 + (1 - distanceFromCenter) * 0.03); // Center flowers are dynamically larger
+        this.maxFlowerSize = canvas.width * (0.11 + (1 - distanceFromCenter) * 0.03); 
 
-        // Organic stem curvature
         this.controlX = this.x + (Math.random() * 80 - 40);
         this.controlY = (canvas.height + this.targetY) / 2;
 
@@ -357,7 +354,6 @@ class Lotus {
 
     draw() {
         ctx.save();
-        
         ctx.beginPath();
         ctx.moveTo(this.x, this.startY);
         
