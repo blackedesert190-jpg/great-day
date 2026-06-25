@@ -27,14 +27,13 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            /* Moved background gradient here to cover the entire container panel flawlessly */
             background: radial-gradient(circle at center 75%, #140b1a 0%, #030105 100%);
             border-radius: 24px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
         canvas {
-            background: transparent; /* Changed to transparent so container background shows through */
+            background: transparent;
             border-radius: 24px;
             position: absolute;
             top: 0;
@@ -44,7 +43,6 @@
             z-index: 1;
         }
 
-        /* The WOW effect overlay matching the canvas precisely */
         #wowOverlay {
             position: absolute;
             top: 0;
@@ -74,7 +72,6 @@
             box-shadow: inset 0 0 80px 40px rgba(255, 229, 240, 0.25);
         }
 
-        /* Large Centered Click Me Button */
         #playBtn {
             position: relative;
             z-index: 10;
@@ -97,10 +94,9 @@
             transform: scale(0.95);
         }
 
-        /* Elegant text adjustment */
         #greetingText {
             position: absolute;
-            top: 32%; /* Lowered from 18% to perfectly sit right above the blooming heads */
+            top: 32%; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
@@ -116,7 +112,6 @@
             text-shadow: 0 0 15px rgba(255, 102, 178, 0.8), 0 2px 4px rgba(0,0,0,0.9);
         }
 
-        /* Individual Character Glow Entry for Magic Spell Effect */
         .magic-char {
             display: inline-block;
             opacity: 0;
@@ -179,7 +174,6 @@ const PINK_GLOW = '#ff66b2';
 const GOLD_GLOW = '#ffb300';
 const WHITE_CORE = '#ffe5f0';
 
-// Resize the drawing buffer to match the exact resolution dynamically
 function resizeCanvas() {
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width;
@@ -219,14 +213,18 @@ class Particle {
 class Lotus {
     constructor(x) {
         this.x = x;
-        this.startY = canvas.height + 20; // Starts right at the bottom edge
+        this.startY = canvas.height + 20; 
         this.currentProgress = 0; 
         this.growSpeed = 0.005 + Math.random() * 0.002;
         
-        // Target height calibrated for typical display heights
-        this.targetY = canvas.height * 0.42 + Math.random() * (canvas.height * 0.15); 
+        // Dynamic Curved Arch Calculation:
+        // Calculates distance from the horizontal center line to scale heights beautifully.
+        const distanceFromCenter = Math.abs(x - canvas.width / 2) / (canvas.width / 2);
+        const baseHeightCurve = canvas.height * (0.35 + (distanceFromCenter * 0.18)); 
+        this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.05);
+        
         this.bloomProgress = 0; 
-        this.maxFlowerSize = canvas.width * 0.12; // Scaled relative to the width of the screen
+        this.maxFlowerSize = canvas.width * 0.12; 
 
         this.controlX = this.x + (Math.random() * 60 - 30);
         this.controlY = (canvas.height + this.targetY) / 2;
@@ -472,7 +470,6 @@ function triggerWowEffect() {
     }
 }
 
-// Initial calculation
 window.addEventListener('load', () => {
     resizeCanvas();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
