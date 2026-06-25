@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Glowing Lotus Garden</title>
+    <!-- Google Fonts for Ultra-Premium & Elegant Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,500&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
@@ -137,10 +138,10 @@
             transform: scale(0.97);
         }
 
-        /* High-End, Elegant Serif Typography Layout */
+        /* Shifted higher up to create an intentional, luxurious gap */
         #greetingText {
             position: absolute;
-            top: 20%; /* Raised from 26% to clear more space above the flowers */
+            top: 13%; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
@@ -265,7 +266,9 @@ class Lotus {
         this.growSpeed = 0.004 + Math.random() * 0.0015; 
         
         const distanceFromCenter = Math.abs(x - canvas.width / 2) / (canvas.width / 2);
-        const baseHeightCurve = canvas.height * (0.40 + (distanceFromCenter * 0.16)); 
+        
+        // Pushed the bloom height targets down to canvas.height * 0.52 to provide extra negative space under the text
+        const baseHeightCurve = canvas.height * (0.52 + (distanceFromCenter * 0.14)); 
         this.targetY = baseHeightCurve + (Math.random() * canvas.height * 0.04);
         
         this.bloomProgress = 0; 
