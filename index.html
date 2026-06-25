@@ -19,11 +19,15 @@
         
         #container {
             position: relative;
-            width: 800px;
-            height: 650px;
+            width: 100%;
+            max-width: 800px;
+            height: 100vh;
+            max-height: 650px;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         canvas {
@@ -31,18 +35,25 @@
             border-radius: 16px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1;
+            max-width: calc(100% - 20px);
+            max-height: calc(100vh - 20px);
+            object-fit: contain;
         }
 
         /* The WOW effect overlay on the canvas */
         #wowOverlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% - 20px);
             height: 100%;
+            max-width: 800px;
+            max-height: 650px;
             border-radius: 16px;
             pointer-events: none;
             z-index: 2;
@@ -73,8 +84,8 @@
         #playBtn {
             position: relative;
             z-index: 10;
-            padding: 18px 50px;
-            font-size: 20px;
+            padding: 16px 44px;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: 2px;
             color: #ffffff;
@@ -85,6 +96,7 @@
             cursor: pointer;
             box-shadow: 0 8px 25px rgba(255, 64, 129, 0.5);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            touch-action: manipulation;
         }
 
         #playBtn:hover {
@@ -97,23 +109,31 @@
             transform: scale(0.95);
         }
 
-        /* Elegant Text at the Top - Scaled up slightly */
+        /* Elegant Text at the Top - Responsive adjustments */
         #greetingText {
             position: absolute;
-            top: 55px;
+            top: 12%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
             font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
-            font-size: 46px; 
+            font-size: 5.5vw; /* Scales text neatly based on viewport width */
             font-weight: 300;
             font-style: italic;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             color: #ffe5f0;
             text-align: center;
             pointer-events: none;
-            min-width: 700px;
+            width: 90%;
             text-shadow: 0 0 20px rgba(255, 102, 178, 0.8), 0 2px 5px rgba(0,0,0,0.9);
+        }
+
+        /* Desktop specific size limit for text so it doesn't get ridiculously huge */
+        @media (min-width: 800px) {
+            #greetingText {
+                font-size: 46px;
+                top: 55px;
+            }
         }
 
         /* Individual Character Glow Entry for Magic Spell Effect */
@@ -148,7 +168,7 @@
         .hide {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: scale(0.8) !important;
+            transform: translate(-50%, -50%) scale(0.8) !important;
         }
     </style>
 </head>
@@ -400,8 +420,6 @@ function initGarden() {
     const totalStems = 5; 
     const spacing = canvas.width / (totalStems + 1); 
 
-    // Balanced size uniformity. The sizes are clustered tightly so the last two 
-    // look equally full and visually identical to the rest of the garden.
     const definedSizes = [84, 82, 80, 78, 76]; 
     
     for (let i = 1; i <= totalStems; i++) {
